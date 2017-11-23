@@ -30,6 +30,9 @@ TEMPLATE = lib
 CONFIG += dll
 QT += network dbus
 
+CONFIG += link_pkgconfig
+PKGCONFIG += Qt5SystemInfo
+
 DEFINES += CREPORTER_EXPORTS
 
 message(Building architecture: $$system(uname -m))

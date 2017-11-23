@@ -230,6 +230,8 @@ void CReporterDaemonMonitorPrivate::handleDirectoryChanged(const QString &path)
         }
         if (!CReporterNwSessionMgr::canUseNetworkConnection()) {
             qCDebug(cr) << "WiFi not available, not uploading now.";
+        } else if (CReporterUtils::shouldSavePower()) {
+            qCDebug(cr) << "On low battery, not uploading now.";
         } else {
             /* In auto-upload mode try to upload all crash reports each
              * time a new one appears. */

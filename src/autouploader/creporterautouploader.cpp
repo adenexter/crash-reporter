@@ -106,7 +106,7 @@ CReporterAutoUploader::~CReporterAutoUploader()
 }
 
 bool CReporterAutoUploader::uploadFiles(const QStringList &fileList,
-                                        bool obeyNetworkRestrictions)
+                                        bool obeyResourcesRestrictions)
 {
     qCDebug(cr) << "Received a list of files to upload.";
 
@@ -119,9 +119,16 @@ bool CReporterAutoUploader::uploadFiles(const QStringList &fileList,
         connect(d_ptr->engine, SIGNAL(finished(int, int, int)), SLOT(engineFinished(int, int, int)));
     }
 
-    if (obeyNetworkRestrictions &&
+    if (obeyResourcesRestrictions &&
             !CReporterNwSessionMgr::canUseNetworkConnection()) {
         qCDebug(cr) << "No unpaid network connection available, aborting crash report upload.";
+        QTimer::singleShot(0, this, SLOT(quit()));
+        return false;
+    }
+
+    if (obeyResourcesRestrictions &&
+            CReporterUtils::shouldSavePower()) {
+        qCDebug(cr) << "On low battery, aborting crash report upload.";
         QTimer::singleShot(0, this, SLOT(quit()));
         return false;
     }

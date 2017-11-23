@@ -158,6 +158,32 @@ Page {
             }
 
             SectionHeader {
+                //% "Battery care"
+                text: qsTrId("settings_crash-reporter_battery_care")
+            }
+
+            TextSwitch {
+                automaticCheck: false
+                checked: PrivacySettings.restrictWhenLowBattery
+                //% "Not when battery is low"
+                text: qsTrId("settings_crash-reporter_restrict_when_low_battery")
+                //% "Avoid power intensive tasks when battery is low, regardless of charger presence."
+                description: qsTrId("settings_crash-reporter_restrict_when_low_battery_descrition")
+                onClicked: PrivacySettings.restrictWhenLowBattery = !PrivacySettings.restrictWhenLowBattery
+            }
+
+            TextSwitch {
+                automaticCheck: false
+                checked: PrivacySettings.restrictWhenDischarging
+                //% "Require charger below %1%"
+                text: qsTrId("settings_crash-reporter_restrict_when_discharging")
+                    .arg(PrivacySettings.dischargingThreshold)
+                //% "Avoid power intensive tasks when discharging and battery level dropped too much."
+                description: qsTrId("settings_crash-reporter_restrict_when_discharging_description")
+                onClicked: PrivacySettings.restrictWhenDischarging = !PrivacySettings.restrictWhenDischarging
+            }
+
+            SectionHeader {
                 //% "Stack trace"
                 text: qsTrId("settings_crash-reporter_stack_trace")
             }

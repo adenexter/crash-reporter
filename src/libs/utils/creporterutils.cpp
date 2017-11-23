@@ -33,6 +33,7 @@
 #endif
 
 #include <QDebug>
+#include <QBatteryInfo>
 #include <QFileInfo>
 #include <QDir>
 #include <QFile>
@@ -43,6 +44,10 @@
 #include "creporternamespace.h"
 #include "../autouploader_interface.h" // generated
 #include "../ssu_interface.h" // generated
+
+#ifndef CREPORTER_UNIT_TEST
+#include "creporterprivacysettingsmodel.h"
+#endif
 
 namespace CReporter {
 namespace LoggingCategory {
@@ -204,6 +209,28 @@ QString CReporterUtils::deviceModel()
 #endif
 }
 
+bool CReporterUtils::shouldSavePower()
+{
+#ifndef CREPORTER_UNIT_TEST
+    QBatteryInfo info;
+    auto *settings = CReporterPrivacySettingsModel::instance();
+
+    if (info.batteryCount() == 0)
+        return false;
+
+    if (info.levelStatus() == QBatteryInfo::LevelFull) {
+        return false;
+    } else if (info.chargingState() == QBatteryInfo::Charging) {
+        return !settings->restrictWhenLowBattery() || info.levelStatus() == QBatteryInfo::LevelOk;
+    } else {
+        int threshold = info.maximumCapacity() * settings->dischargingThreshold() / 100;
+        return !settings->restrictWhenDischarging() || info.remainingCapacity() < threshold;
+    }
+#else
+    return false;
+#endif
+}
+
 bool CReporterUtils::reportIncludesCrash(const QString &fileName)
 {
     return !(fileName.contains(CReporter::QuickFeedbackPrefix) ||
@@ -217,7 +244,7 @@ bool CReporterUtils::reportIncludesCrash(const QString &fileName)
 }
 
 bool CReporterUtils::notifyAutoUploader(const QStringList &filesToUpload,
-                                        bool obeyNetworkRestrictions)
+                                        bool obeyResourcesRestrictions)
 {
     qCDebug(cr) << "Requesting crash-reporter-autouploader to upload"
                 << filesToUpload.size() << "files.";
@@ -226,7 +253,7 @@ bool CReporterUtils::notifyAutoUploader(const QStringList &filesToUpload,
             CReporter::AutoUploaderObjectPath, QDBusConnection::sessionBus());
 
     QDBusPendingReply <bool>reply =
-        proxy.uploadFiles(filesToUpload, obeyNetworkRestrictions);
+        proxy.uploadFiles(filesToUpload, obeyResourcesRestrictions);
     // This blocks.
     reply.waitForFinished();
 
