@@ -31,7 +31,8 @@ CONFIG += dll
 QT += network dbus
 
 CONFIG += link_pkgconfig
-PKGCONFIG += Qt5SystemInfo
+PKGCONFIG += Qt5SystemInfo \
+             usb-moded-qt5
 
 DEFINES += CREPORTER_EXPORTS
 

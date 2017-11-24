@@ -25,6 +25,7 @@ BuildRequires:          pkgconfig(libudev)
 BuildRequires:          pkgconfig(mce)
 BuildRequires:          pkgconfig(qt5-boostable)
 BuildRequires:          pkgconfig(Qt5SystemInfo)
+BuildRequires:          pkgconfig(usb-moded-qt5)
 Requires:               sp-rich-core >= 1.71.2
 Requires:               sp-endurance
 Requires:               oneshot
