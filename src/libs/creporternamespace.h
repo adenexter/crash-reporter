@@ -140,6 +140,9 @@ const QString ApplicationNotificationEventType = "x-nemo.crash-reporter.notifica
 
 //! Event type for autouploader notifications
 const QString AutoUploaderNotificationEventType = "x-nemo.crash-reporter.autouploader";
+
+//! Event type for storage usage notifications
+const QString StorageUsageNotificationEventType = "x-nemo.crash-reporter.storage-usage";
 }
 
 #endif // CREPORTERNAMESPACE_H

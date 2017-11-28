@@ -83,6 +83,7 @@ make %{_smp_mflags}
 /usr/lib/oneshot.d/*
 /usr/lib/systemd/user/*
 %attr(0755,root,root) /usr/libexec/crash-reporter-journalspy
+%attr(0755,root,root) /usr/libexec/crash-reporter-storagemon
 %attr(0755,root,root) /usr/libexec/endurance-collect*
 %attr(4755,root,root) /usr/libexec/rich-core-helper
 %attr(4750,root,privileged) /usr/libexec/crashreporter-servicehelper
@@ -119,6 +120,7 @@ make %{_smp_mflags}
 
 %post
 systemctl daemon-reload
+su -l nemo -c "systemctl --user daemon-reload || :"
 ## on first install
 #if [ "$1" -eq 1 ]; then
 #	add-oneshot --user --now crash-reporter-service-default
@@ -126,7 +128,9 @@ systemctl daemon-reload
 
 %preun
 if [ "$1" = 0 ]; then
-  su nemo -c "systemctl --user stop crash-reporter.service"
+  su -l nemo -c "systemctl --user stop crash-reporter.service \
+                                       crash-reporter-storagemon.path \
+                                       crash-reporter-storagemon.service || :"
   systemctl stop crash-reporter-endurance.service
 fi
 

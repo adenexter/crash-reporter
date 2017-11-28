@@ -48,7 +48,8 @@ scripts.files = scripts/crash-report-monitoring
 
 notifications.path = $${CREPORTER_SYSTEM_SHARE}/lipstick/notificationcategories/
 notifications.files = data/x-nemo.crash-reporter.autouploader.conf \
-                      data/x-nemo.crash-reporter.notification.conf
+                      data/x-nemo.crash-reporter.notification.conf \
+                      data/x-nemo.crash-reporter.storage-usage.conf
 
 settings.path = $$CREPORTER_SETTINGS_PATH
 settings.files += \
@@ -56,8 +57,18 @@ settings.files += \
 	data/crash-reporter.conf \
 	data/journalspy-expressions.conf \
 
-systemd_service.path = $${CREPORTER_SYSTEM_SYSTEMD_USER_SERVICES}
-systemd_service.files = data/crash-reporter.service
+PATHS_TARGET_WANTS = \
+	$(INSTALL_ROOT)/$$CREPORTER_SYSTEM_SYSTEMD_USER_SERVICES/paths.target.wants
+
+systemd_user_services.path = $${CREPORTER_SYSTEM_SYSTEMD_USER_SERVICES}
+systemd_user_services.files = \
+        data/crash-reporter.service \
+        data/crash-reporter-storagemon.path \
+        data/crash-reporter-storagemon.service
+systemd_user_services.commands = \
+	mkdir $$PATHS_TARGET_WANTS; \
+	ln -s ../crash-reporter-storagemon.path \
+		$$PATHS_TARGET_WANTS/crash-reporter-storagemon.path;
 
 MULTI_USER_TARGET_WANTS = \
 	$(INSTALL_ROOT)/$$CREPORTER_SYSTEM_SYSTEMD_SYSTEM_SERVICES/multi-user.target.wants
@@ -79,5 +90,5 @@ endurance_script.files = scripts/endurance-collect
 oneshot.path = $${CREPORTER_SYSTEM_ONESHOT}
 oneshot.files = scripts/crash-reporter-service-default
 
-INSTALLS += scripts notifications settings systemd_service \
+INSTALLS += scripts notifications settings systemd_user_services \
 	systemd_services endurance_script oneshot
